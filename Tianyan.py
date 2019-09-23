@@ -14,6 +14,8 @@ class Tyc(object):
 		chrome_path = 'C:\Program Files (x86)\chromedriver\chromedriver.exe'
 		self.driver = webdriver.Chrome(executable_path=chrome_path)
 		self.driver.get(Url)
+		self.driver.maximize_window()
+
 
 	def __del__(self):
 		self.driver.close()
@@ -70,6 +72,8 @@ class Tyc(object):
 		# 验证码尺寸
 		size = img.size
 		top, bottom, left, right = location['y']+3, location['y'] + size['height'], location['x']-325, location['x'] + size['width']-328
+		# 加入代码self.driver.maximize_window()使浏览器全屏后就不需要修改位置参数了
+        	top, bottom, left, right = location['y'], location['y'] + size['height'], location['x'], location['x'] + size['width']
 		picture = Image.open(r'./Images/Tyc.png')
 		picture = picture.crop((left, top, right, bottom))
 		picture.save(r'./Images/%s' % name)
