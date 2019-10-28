@@ -14,7 +14,7 @@ class Tyc(object):
         chrome_path = 'C:\Program Files (x86)\chromedriver\chromedriver.exe'
         self.driver = webdriver.Chrome(executable_path=chrome_path)
         self.driver.get(Url)
-        self.driver.maximize_window()
+        self.driver.maximize_window()  # 让浏览器自动最大化
 
     def __del__(self):
         self.driver.close()
@@ -71,7 +71,7 @@ class Tyc(object):
         # 验证码尺寸
         size = img.size
         # top, bottom, left, right = location['y']+3, location['y'] + size['height'], location['x']-325, location['x'] + size['width']-328
-        # 加入代码self.driver.maximize_window()使浏览器全屏后就不需要修改位置参数了
+        # 加入代码self.driver.maximize_window()使浏览器全屏后就不需要修改位置参数了,mac上不知道什么原因需要修改位置
         top, bottom, left, right = location['y'], location['y'] + size['height'], location['x'], location['x'] + size['width']
         picture = Image.open(r'./Images/Tyc.png')
         picture = picture.crop((left, top, right, bottom))
@@ -168,7 +168,7 @@ class Tyc(object):
             distance = self.get_distance(bg_image, full_image)
             print('计算偏移量为：%s Px' % distance)
             # 位移算法
-            trace = self.get_trace(int(distance)-8)
+            trace = self.get_trace(int(distance))  # 拖动过来可以上来先做减值
             print(trace)
             # 移动滑块
             self.move_to_gap(trace)
@@ -207,17 +207,38 @@ class Tyc(object):
             else:
                 print(e)
 
-    def get_html(self):
+    def get_cookie(self):
         time.sleep(3)
-        cookies = self.driver.get_cookies()
-        print('=============================')
-        print(cookies)
+        try:
+            # 定位登陆后昵称名来判断是否登陆成功
+            login_name = self.driver.find_element_by_xpath('//div[@nav-type="user"]/a').get_attribute("text")
+            print(login_name)
+            time.sleep(3)
+            cookie = {}
+            cookies = self.driver.get_cookies()
+            for i in cookies:
+                a = i['name']
+                b = i['value']
+                cookie[a] = b
+            self.cookie_to_redis(cookie)
+        except Exception as e:
+            print(e)
+
+    def cookie_to_redis(self, cookie):
+        # 连接数据库
+        from redis import StrictRedis, ConnectionPool
+        # 使用连接池
+        pool = ConnectionPool(host='localhost', port=6379, db=0)
+        rds = StrictRedis(connection_pool=pool)
+        rds.set('ck', '%s' % cookie)
+        # 然后将其获取并打印
+        print(rds.get('ck'))
 
     def entrace(self):
         self.open_login()
         self.get_image_location()
         self.slice()
-        self.get_html()
+        self.get_cookie()
 
 
 if __name__ == '__main__':
