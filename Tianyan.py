@@ -14,7 +14,7 @@ class Tyc(object):
         chrome_path = 'C:\Program Files (x86)\chromedriver\chromedriver.exe'
         self.driver = webdriver.Chrome(executable_path=chrome_path)
         self.driver.get(Url)
-        self.driver.maximize_window()  # 让浏览器自动最大化
+        self.driver.maximize_window()
 
     def __del__(self):
         self.driver.close()
@@ -28,18 +28,18 @@ class Tyc(object):
     def open_login(self):
         try:
             t = random.uniform(0.5, 1)
-            time.sleep(3)
-            login_button = self.driver.find_element_by_xpath('//a[@class="link-white"]')
+            time.sleep(t)
+            login_button = self.driver.find_element_by_xpath('//a[@onclick="header.loginLink(event)"]')
             login_button.click()
             time.sleep(2)
-            pwd_button = self.driver.find_element_by_xpath('//div[@class="module module1 module2 loginmodule collapse in"]/div[1]/div[2]')
+            pwd_button = self.driver.find_element_by_xpath('//div[@active-tab="1"]')
             pwd_button.click()
-            time.sleep(3)
-            username = self.driver.find_element_by_xpath('//div/div[2]/div/div/div[3]/div[2]/div[2]/input')
-            username.send_keys('账号')
+            time.sleep(1)
+            username = self.driver.find_element_by_xpath('//div[@class="pb24 position-rel"]/div[1]/input[@id="mobile"]')
+            username.send_keys('15502138925')
             time.sleep(t)
-            password = self.driver.find_element_by_xpath('//input[@class="input contactword input-pwd"]')
-            password.send_keys('密码')
+            password = self.driver.find_element_by_xpath('//div[@class="input-warp -block"]/input[@id="password"]')
+            password.send_keys('Btyzww128037210')
             time.sleep(1)
             click_button = self.driver.find_element_by_xpath('//div[@onclick="loginObj.loginByPhone(event);"]')
             click_button.click()
@@ -50,7 +50,7 @@ class Tyc(object):
 
     def get_image_location(self):
         # 获取验证码图片路径--->调用get_images截取图片
-        fullbg = self.driver.find_element_by_xpath('//div[10]/div[2]/div[2]/div[1]/div[2]/div[1]')
+        fullbg = self.driver.find_element_by_xpath('//a[@class="gt_fullbg gt_show"]')
         self.hide_element(fullbg)
         self.show_element(fullbg)
         # 获取完整图片
@@ -59,7 +59,7 @@ class Tyc(object):
         self.driver.find_element_by_xpath('//div[@class="gt_slider_knob gt_show"]').click()
         time.sleep(2)
         # 获取带缺口的图片
-        bg = self.driver.find_element_by_xpath('//div[10]/div[2]/div[2]/div[1]/div[2]/div[1]')
+        bg = self.driver.find_element_by_xpath('//div[@class="gt_cut_fullbg gt_show"]')
         self.show_element(bg)
         self.get_images(bg, 'tyc_bg.png')
 
@@ -210,7 +210,6 @@ class Tyc(object):
     def get_cookie(self):
         time.sleep(3)
         try:
-            # 定位登陆后昵称名来判断是否登陆成功
             login_name = self.driver.find_element_by_xpath('//div[@nav-type="user"]/a').get_attribute("text")
             print(login_name)
             time.sleep(3)
